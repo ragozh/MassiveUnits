@@ -89,13 +89,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5212059791423417603}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.38268343, y: -0, z: -0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 10, z: -10}
+  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
+  m_LocalPosition: {x: 0, y: 15, z: -7.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 597028835709142506}
-  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
 --- !u!20 &7729454588938267169
 Camera:
   m_ObjectHideFlags: 0
@@ -105,7 +105,7 @@ Camera:
   m_GameObject: {fileID: 5212059791423417603}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 3
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -165,7 +165,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4735966259998327978
 Transform:
   m_ObjectHideFlags: 0
@@ -300,8 +300,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerModel: {fileID: 6878743087841391840}
-  _objDirection: {fileID: 0}
-  _moveSpeed: 0
+  _objDirection: {fileID: 4954280352877156501}
+  _moveSpeed: 5
+  _animator: {fileID: 0}
 --- !u!1001 &7377815109399798552
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -354,10 +355,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: WerewolfPBRDefault
       objectReference: {fileID: 0}
+    - target: {fileID: 5785497811910807157, guid: 4490a140cb3d426dba068c385035e421, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5785497811910807157, guid: 4490a140cb3d426dba068c385035e421, type: 3}
+      propertyPath: m_ReceiveShadows
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5785497811915092149, guid: 4490a140cb3d426dba068c385035e421, type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: dd60ec4f8a5b8504081fbee0af8481cb, type: 2}
+    - target: {fileID: 5785497811915092149, guid: 4490a140cb3d426dba068c385035e421, type: 3}
+      propertyPath: m_UpdateMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5785497811915092149, guid: 4490a140cb3d426dba068c385035e421, type: 3}
+      propertyPath: m_CullingMode
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

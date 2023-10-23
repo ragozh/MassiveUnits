@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -6,16 +7,26 @@ public class UIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InvokeRepeating("ShowFPS", 0.0f, 0.5f);
+        StartCoroutine(ShowFPS(_updateDelay));
     }
     [SerializeField]
-    TextMeshProUGUI _fps;
+    TextMeshProUGUI _fps, _mobCount;
+    [SerializeField]
+    float _updateDelay = 0.5f;
+    bool _trackingFPS = true;
+
     // Update is called once per frame
     void Update()
     {
     }
-    void ShowFPS()
+
+    IEnumerator ShowFPS(float delay)
     {
-        _fps.text = $"FPS: {string.Format("{0:0.00}", 1.0f / Time.smoothDeltaTime)}";
+        while (_trackingFPS)
+        {
+            yield return new WaitForSeconds(delay);
+            _fps.text = $"FPS: {string.Format("{0:0.00}", 1.0f / Time.smoothDeltaTime)}";
+            _mobCount.text = $"Count: {Spawner.Instance.MobCount}";
+        }
     }
 }
