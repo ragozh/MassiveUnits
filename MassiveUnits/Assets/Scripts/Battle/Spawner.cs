@@ -41,34 +41,54 @@ public class Spawner : MonoBehaviour
     void Start()
     {
     }
-    public void StartSpawn()
+    public void StartSpawn(int spawnCount)
     {
-        StartCoroutine(Spawning());
+        StartCoroutine(Spawning(spawnCount));
     }
-    IEnumerator Spawning()
+    IEnumerator Spawning(int spawnCount)
     {
-        while (_mobCount < 1050)
+        while (_mobCount < spawnCount)
         {
+            //SpawnAMob();
             for (int i = 0; i < _countPerSpawn; i++)
             {
-                SpawnAMob("MeleeMob"); // MeleeMob RangeMob
+                var newMob = SpawnAMob(); // MeleeMob RangeMob
+                BattleManager.Instance.MobsAlive.Add(newMob);
             }
             yield return new WaitForSeconds(_spawnRate);
         }
+        yield return null;
     }
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.Alpha1))
         {
-            StartSpawn();
+            StartSpawn(1);
+        }
+        if (Input.GetKey(KeyCode.Alpha2))
+        {
+            StartSpawn(10);
+        }
+        if (Input.GetKey(KeyCode.Alpha3))
+        {
+            StartSpawn(100);
+        }
+        if (Input.GetKey(KeyCode.Alpha4))
+        {
+            StartSpawn(1000);
         }
     }
-    public MobController SpawnAMob(string model)
+    public MobController SpawnAMob()
     {
+        string model = Random.Range(0, 11) < 4 ? "RangeMob" : "MeleeMob";
+        float range = model == "RangeMob" ? 6 : 2;
+        float moveSpeed = model == "RangeMob" ? 2.5f : 3;
         var randomPosition = GetRandomPosition();
         var newMobObj = _mobPrefab.gameObject.Spawn(randomPosition, transform);
         var newMob = newMobObj.GetComponent<MobController>();
+        newMob.Range = range;
+        newMob.MoveSpeed = moveSpeed;
         var modelPref = Resources.Load<GameObject>("Prefabs/" + model);
         modelPref.Spawn(randomPosition, newMob.ModelHolder);
         modelPref.transform.localPosition = Vector3.zero;

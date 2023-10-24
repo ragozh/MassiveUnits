@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6049481182800098255}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,9 +41,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4791440887358081036}
   - component: {fileID: 8453906782856534486}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MobPrefab
-  m_TagString: Untagged
+  m_TagString: Mob
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -76,4 +76,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20bda1580ad92fa49ab9e841787f05f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _modelHolder: {fileID: 6049481182800098255}
+  ModelHolder: {fileID: 6049481182800098255}
+  Range: 0
+  MoveSpeed: 0

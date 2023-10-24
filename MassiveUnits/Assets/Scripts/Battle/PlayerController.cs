@@ -21,6 +21,10 @@ public class PlayerController : MonoBehaviour
     PlayerState _state = PlayerState.ILDE;
     void Update()
     {
+        
+    }
+    private void FixedUpdate()
+    {
         var direction = InputHandler();
         if (direction.sqrMagnitude > 0)
         {
