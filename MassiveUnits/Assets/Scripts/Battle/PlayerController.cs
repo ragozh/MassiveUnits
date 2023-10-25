@@ -25,6 +25,11 @@ public class PlayerController : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            Attack();
+            return;
+        }
         var direction = InputHandler();
         if (direction.sqrMagnitude > 0)
         {
@@ -46,6 +51,15 @@ public class PlayerController : MonoBehaviour
                 _objDirection.localPosition = Vector3.zero;
             }
         }
+    }
+    [SerializeField]
+    Transform _weapon;
+    [SerializeField]
+    float _range, _arc;
+    public void Attack()
+    {
+        var stabDestinatiob = _playerModel.forward * _range;
+        _weapon.LookAt(stabDestinatiob);
     }
     public void PlayAnim(string animName, float animDuration = 0)
     {
