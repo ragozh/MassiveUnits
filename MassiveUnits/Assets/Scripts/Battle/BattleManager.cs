@@ -54,32 +54,50 @@ public class BattleManager : MonoBehaviour
         {
             return;
         }
-        var allPosition = MobsAlive.Select(x => x.transform.position).ToArray();
-        NativeArray<float3> MobsPosition = new NativeArray<float3>(allPosition.Length, Allocator.TempJob);
-        MobsPosition.Reinterpret<Vector3>().CopyFrom(allPosition);
-        NativeArray<float3> NewMobsPosition = new NativeArray<float3>(allPosition.Length, Allocator.TempJob);
+        //var allPosition = MobsAlive.Select(x => x.transform.position).ToArray();
+        //NativeArray<float3> MobsPosition = new NativeArray<float3>(allPosition.Length, Allocator.TempJob);
+        //MobsPosition.Reinterpret<Vector3>().CopyFrom(allPosition);
+        var allMob = MobsAlive.Select(x => x.Data).ToArray();
+        NativeArray<MobData> allMobsData = new NativeArray<MobData>(allMob.Length, Allocator.TempJob);
+        allMobsData.CopyFrom(allMob);
+
+        NativeArray<float3> NewMobsPosition = new NativeArray<float3>(allMob.Length, Allocator.TempJob);
+        NativeArray<bool> shouldMove = new NativeArray<bool>(allMob.Length, Allocator.TempJob);
         MobJob newMobJob = new MobJob()
         {
-            Range = 3,
-            MoveSpeed = 2.5f,
-            MobsPosition = MobsPosition,
+            //Range = 3,
+            //MoveSpeed = 2.5f,
+            //MobsPosition = MobsPosition,
+            Mobs = allMobsData,
             PlayerPosition = BattleManager.Instance.Player.position,
-            DeltaTIme = Time.deltaTime,
-            NewPosition = NewMobsPosition
+            DeltaTime = Time.deltaTime,
+            NewPosition = NewMobsPosition,
+            ShouldMove = shouldMove
         };
 
-        JobHandle mobJobHandle = newMobJob.Schedule(MobsPosition.Length, 20);
+        JobHandle mobJobHandle = newMobJob.Schedule(allMob.Length, 20);
 
         mobJobHandle.Complete();
-        Vector3[] newPosition = new Vector3[MobsPosition.Length];
+        Vector3[] newPosition = new Vector3[allMob.Length];
         newMobJob.NewPosition.Reinterpret<Vector3>().CopyTo(newPosition);
-        UpdateAllMobPosition(newPosition);
+        bool[] movable = new bool[allMob.Length];
+        newMobJob.ShouldMove.CopyTo(movable);
+        UpdateAllMobPosition(newPosition, movable);
     }
-    void UpdateAllMobPosition(Vector3[] positions)
+    void UpdateAllMobPosition(Vector3[] positions, bool[] shouldMove)
     {
         for (int i = 0; i < MobsAlive.Count; i++)
         {
-            MobsAlive[i].transform.position = positions[i];
+            var mob = MobsAlive[i];
+            mob.transform.LookAt(BattleManager.Instance.Player.position);
+            if (shouldMove[i])
+            {
+                mob.Step(positions[i]);
+            }
+            else
+            {
+                mob.Attack();
+            }
         }
     }
 }

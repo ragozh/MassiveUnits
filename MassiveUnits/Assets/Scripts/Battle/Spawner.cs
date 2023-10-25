@@ -82,15 +82,16 @@ public class Spawner : MonoBehaviour
     public MobController SpawnAMob()
     {
         string model = Random.Range(0, 11) < 4 ? "RangeMob" : "MeleeMob";
-        float range = model == "RangeMob" ? 6 : 2;
+        float range = model == "RangeMob" ? 4 : 2;
         float moveSpeed = model == "RangeMob" ? 2.5f : 3;
-        var randomPosition = GetRandomPosition();
-        var newMobObj = _mobPrefab.gameObject.Spawn(randomPosition, transform);
+        var rdPos = GetRandomPosition();
+        System.Numerics.Vector3 newPos = new System.Numerics.Vector3(rdPos.x, rdPos.y, rdPos.z);
+        MobData mobData = new MobData(range, moveSpeed, newPos);
+        var newMobObj = _mobPrefab.gameObject.Spawn(rdPos, transform);
         var newMob = newMobObj.GetComponent<MobController>();
-        newMob.Range = range;
-        newMob.MoveSpeed = moveSpeed;
+        newMob.Data = mobData;
         var modelPref = Resources.Load<GameObject>("Prefabs/" + model);
-        modelPref.Spawn(randomPosition, newMob.ModelHolder);
+        modelPref.Spawn(rdPos, newMob.ModelHolder);
         modelPref.transform.localPosition = Vector3.zero;
         _mobCount++;
         return newMob;

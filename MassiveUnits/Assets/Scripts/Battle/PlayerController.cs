@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
     }
     // Update is called once per frame
-    PlayerState _state = PlayerState.ILDE;
+    UnitState _state = UnitState.ILDE;
     void Update()
     {
         
@@ -28,9 +28,9 @@ public class PlayerController : MonoBehaviour
         var direction = InputHandler();
         if (direction.sqrMagnitude > 0)
         {
-            if (_state != PlayerState.WALK)
+            if (_state != UnitState.WALK)
             {
-                _state = PlayerState.WALK;
+                _state = UnitState.WALK;
                 PlayAnim("WalkFWD");
             }
             _objDirection.localPosition = direction;
@@ -39,9 +39,9 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (_state != PlayerState.ILDE)
+            if (_state != UnitState.ILDE)
             {
-                _state = PlayerState.ILDE;
+                _state = UnitState.ILDE;
                 PlayAnim("IdleBattle");
                 _objDirection.localPosition = Vector3.zero;
             }
@@ -94,11 +94,11 @@ public class PlayerController : MonoBehaviour
         }
         return direction.normalized;
     }
-    public enum PlayerState : byte
-    {
-        ILDE = 0,
-        WALK = 1,
-        ATTACK = 2,
-        DIE = 3
-    }
+}
+public enum UnitState : byte
+{
+    ILDE = 0,
+    WALK = 1,
+    ATTACK = 2,
+    DIE = 3
 }
