@@ -40,7 +40,7 @@ public class MobController : MonoBehaviour, IPoolObject
         Data.LastestPosition = new System.Numerics.Vector3(nextStep.x, nextStep.y, nextStep.z);
         if (!Quad.IsInside(Data.LastestPosition))
         {
-            Quad.RemoveMob(Data);
+            Quad.RemoveMob(this);
             BattleManager.Instance.Quadtree.Insert(this);
         }
     }

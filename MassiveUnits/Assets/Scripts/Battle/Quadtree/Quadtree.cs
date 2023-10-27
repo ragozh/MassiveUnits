@@ -8,8 +8,8 @@ public class Quadtree
     int _level;
     float _minX, _minZ, _maxX, _maxZ;
     Quadtree[] nodes;
-    List<MobData> mobs = new List<MobData>();
-    public List<MobData> Mobs => mobs;
+    List<MobController> mobs = new List<MobController>();
+    public List<MobController> Mobs => mobs;
     Quadtree Parent;
     public string QuadIndex = "";
     public Quadtree(int level, int index, float minX, float maxX, float minZ, float maxZ, Quadtree parent = null)
@@ -70,11 +70,11 @@ public class Quadtree
         }
         if (IsInside(mob.Data.LastestPosition))
         {
-            mobs.Add(mob.Data);
+            mobs.Add(mob);
             mob.Quad = this;
         }
     }
-    public void RemoveMob(MobData mob)
+    public void RemoveMob(MobController mob)
     {
         if (mobs.Contains(mob))
         {
@@ -110,16 +110,16 @@ public class Quadtree
         }
         return result;
     }
-    public List<MobData> GetListMobInRange(Vector3 position, float range)
+    public List<MobController> GetListMobInRange(Vector3 position, float range)
     {
         var nPosition = new System.Numerics.Vector3(position.x, position.y, position.z);
-        List<MobData> result = new List<MobData>();
+        List<MobController> result = new List<MobController>();
         var quads = GetQuadInRange(nPosition, range);
         foreach (var quad in quads)
         {
             foreach (var mob in quad.mobs)
             {
-                if ((mob.LastestPosition - nPosition).LengthSquared() <= range * range)
+                if ((mob.Data.LastestPosition - nPosition).LengthSquared() <= range * range)
                     result.Add(mob);
             }
         }

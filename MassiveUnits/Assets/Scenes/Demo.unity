@@ -865,7 +865,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5848194861451664390, guid: 4546a14d222c62f47ac78b8cbb7ef369, type: 3}
       propertyPath: _closeRange
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5848194861451664390, guid: 4546a14d222c62f47ac78b8cbb7ef369, type: 3}
       propertyPath: _attackDelay
