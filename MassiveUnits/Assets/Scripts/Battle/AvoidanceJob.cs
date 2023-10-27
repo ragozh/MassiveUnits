@@ -1,10 +1,8 @@
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 
-[BurstCompile]
-public struct MobJob : IJobParallelFor
+public struct AvoidanceJob : IJobParallelFor
 {
     [ReadOnly] public NativeArray<MobData> Mobs;
     [ReadOnly] public float3 PlayerPosition;
@@ -14,9 +12,7 @@ public struct MobJob : IJobParallelFor
     const float SENSING_RADIUS = 3;
     public void Execute(int index)
     {
-        if (Mobs[index].IsDead) return;
-        float3 newPosition = CalculateNewPosition(index, Mobs[index]);
-        MobSteps[index] = newPosition;
+
     }
 
     private float3 CalculateNewPosition(int index, MobData mob)

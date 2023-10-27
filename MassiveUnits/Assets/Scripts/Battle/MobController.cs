@@ -10,6 +10,7 @@ public class MobController : MonoBehaviour, IPoolObject
     public UnitState State;
     public MobData Data;
     Animator _animator;
+    public Quadtree Quad;
     // Start is called before the first frame update
     void Start()
     {
@@ -37,6 +38,11 @@ public class MobController : MonoBehaviour, IPoolObject
         }
         transform.position = nextStep;
         Data.LastestPosition = new System.Numerics.Vector3(nextStep.x, nextStep.y, nextStep.z);
+        if (!Quad.IsInside(Data.LastestPosition))
+        {
+            Quad.RemoveMob(Data);
+            BattleManager.Instance.Quadtree.Insert(this);
+        }
     }
     public void PlayAnim(string animName, float animDuration = 0, Action callback = null)
     {
@@ -83,7 +89,10 @@ public class MobController : MonoBehaviour, IPoolObject
 
     public void OnDespawn()
     {
-
+        foreach (Transform child in ModelHolder)
+        {
+            child.gameObject.Despawn();
+        }
     }
 
     public void OnCreated()

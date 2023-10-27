@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -32,8 +31,6 @@ public class Spawner : MonoBehaviour
     }
     [SerializeField]
     GameObject _mobPrefab;
-    [SerializeField]
-    int _mapSize;
     float _countPerSpawn = 1;
     [SerializeField]
     float _spawnRate = 0.5f;
@@ -87,7 +84,10 @@ public class Spawner : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.Alpha4))
         {
-            StartSpawn(1000);
+            for (int i = 0; i < 1000; i++)
+            {
+                SpawnAMob();
+            }
         }
     }
     public MobController SpawnAMob()
@@ -97,7 +97,7 @@ public class Spawner : MonoBehaviour
         float moveSpeed = model == "RangeMob" ? 2.5f : 3;
         var rdPos = GetRandomPosition();
         System.Numerics.Vector3 newPos = new System.Numerics.Vector3(rdPos.x, rdPos.y, rdPos.z);
-        MobData mobData = new MobData(range, moveSpeed, newPos);
+        MobData mobData = new MobData(_mobCount, range, moveSpeed, newPos);
         var newMobObj = _mobPrefab.gameObject.Spawn(rdPos, transform);
         var newMob = newMobObj.GetComponent<MobController>();
         newMob.Data = mobData;
@@ -105,13 +105,14 @@ public class Spawner : MonoBehaviour
         modelPref.Spawn(rdPos, newMob.ModelHolder);
         modelPref.transform.localPosition = Vector3.zero;
         _mobCount++;
-        BattleManager.Instance.MobsAlive.Add(newMob);
+        BattleManager.Instance.AddMob(newMob);
         return newMob;
 
         Vector3 GetRandomPosition()
         {
-            int x = Random.Range(-_mapSize / 2, _mapSize / 2);
-            int z = Random.Range(-_mapSize / 2, _mapSize / 2);
+            var mapSize = 50 - 2; // prevent mob spawn in line of quad
+            int x = Random.Range(-mapSize / 2, mapSize / 2);
+            int z = Random.Range(-mapSize / 2, mapSize / 2);
             return new Vector3(x, 0, z);
         }
     }

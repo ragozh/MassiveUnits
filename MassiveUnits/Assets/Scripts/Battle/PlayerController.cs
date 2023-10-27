@@ -115,12 +115,13 @@ public class PlayerController : MonoBehaviour
     }
     public void HitMobInArc(Vector3 middle)
     {
-        var allMobInRange = BattleManager.Instance.MobsAlive.Where(x => !x.Data.IsDead && (transform.position - x.transform.position).sqrMagnitude <= _range * _range).ToList();
+        //var allMobInRange = BattleManager.Instance.MobsAlive.Where(x => !x.Data.IsDead && (transform.position - x.transform.position).sqrMagnitude <= _range * _range).ToList();
+        var allMobInRange = BattleManager.Instance.Quadtree.GetListMobInRange(transform.position, _range);
         List<MobController> hits = new List<MobController>();
         for (int i = 0; i < allMobInRange.Count; i++)
         {
-            var mob = allMobInRange[i];
-            if (mob == null) continue;
+            var mob = BattleManager.Instance.MobsAlive[allMobInRange[i].MobId];
+            if (mob == null || mob.Data.IsDead) continue;
             Vector3 meToTarget = mob.transform.position - _playerModel.position;
             meToTarget = new Vector3(meToTarget.x, 0, meToTarget.z);
             double angle = Vector3.Angle(middle, meToTarget);
