@@ -1,4 +1,3 @@
-using System.Numerics;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -7,32 +6,40 @@ using Unity.Mathematics;
 [BurstCompile]
 public struct MobJob : IJobParallelFor
 {
-    //public float Range;
-    //public float MoveSpeed;
-    //public NativeArray<float3> MobsPosition;
     public NativeArray<MobData> Mobs;
     public float3 PlayerPosition;
     public float DeltaTime;
     public NativeArray<float3> NewPosition;
     public NativeArray<bool> ShouldMove;
+    const float SENSING_RADIUS = 3;
     public void Execute(int index)
     {
-        //float3 position = MobsPosition[index];
-        float3 position = new float3(Mobs[index].LastestPosition.X, Mobs[index].LastestPosition.Y, Mobs[index].LastestPosition.Z);
-        float range = Mobs[index].Range;
-        float moveSpeed = Mobs[index].MoveSpeed;
+        if (Mobs[index].IsDead) return;
+        float3 newPosition = CalculateNewPosition(index, Mobs[index]);
+        NewPosition[index] = newPosition;
+    }
+
+    private float3 CalculateNewPosition(int index, MobData mob)
+    {
+        float3 mobPos = new float3(mob.LastestPosition.X, 0, mob.LastestPosition.Z);
         float3 newPosition;
-        if (math.distancesq(PlayerPosition, position) > range * range)
+        if (math.distancesq(PlayerPosition, mobPos) > mob.Range * mob.Range)
         {
-            float3 direction = PlayerPosition - position;
-            direction = new float3(math.normalize(direction).x, 0, math.normalize(direction).z);
-            newPosition = position + direction * moveSpeed * DeltaTime;
+            var direction = DirectionToPLayer(mobPos);
+            newPosition = mobPos + direction * mob.MoveSpeed * DeltaTime;
             ShouldMove[index] = true;
         }
         else
         {
-            newPosition = position;
+            newPosition = mobPos;
         }
-        NewPosition[index] = newPosition;
+        return newPosition;
+    }
+
+    private float3 DirectionToPLayer(float3 position)
+    {
+        float3 direction = PlayerPosition - position;
+        direction = new float3(math.normalize(direction).x, 0, math.normalize(direction).z);
+        return direction;
     }
 }

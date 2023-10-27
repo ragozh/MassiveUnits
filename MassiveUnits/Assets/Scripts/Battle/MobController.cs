@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class MobController : MonoBehaviour
+public class MobController : MonoBehaviour, IPoolObject
 {
     public Transform ModelHolder;
     public float Range;
@@ -57,6 +57,14 @@ public class MobController : MonoBehaviour
             callback();
         }
     }
+    public void Die()
+    {
+        Data.IsDead = true;
+        PlayAnim("Die",callback: () =>
+        {
+            gameObject.Despawn();
+        });
+    }
     public AnimationClip FindAnimation(Animator animator, string name)
     {
         foreach (AnimationClip clip in animator.runtimeAnimatorController.animationClips)
@@ -68,22 +76,18 @@ public class MobController : MonoBehaviour
         }
         return null;
     }
-    void ChasePlayer()
+    public void OnSpawn()
     {
-        if (PlayerInRange())
-        {
-            return;
-        }
-        else
-        {
-            MoveToPlayer();
-        }
+        Data.IsDead = false;
     }
-    void MoveToPlayer()
+
+    public void OnDespawn()
     {
-        var direction = BattleManager.Instance.Player.position - transform.position;
-        direction = new Vector3(direction.normalized.x, 0, direction.normalized.z);
-        transform.position += direction * MoveSpeed * Time.deltaTime;
+
     }
-    bool PlayerInRange() => BattleManager.Instance.SqrDistanceToPlayer(transform.position) <= Range * Range;
+
+    public void OnCreated()
+    {
+
+    }
 }

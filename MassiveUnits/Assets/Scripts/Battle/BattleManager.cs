@@ -54,9 +54,6 @@ public class BattleManager : MonoBehaviour
         {
             return;
         }
-        //var allPosition = MobsAlive.Select(x => x.transform.position).ToArray();
-        //NativeArray<float3> MobsPosition = new NativeArray<float3>(allPosition.Length, Allocator.TempJob);
-        //MobsPosition.Reinterpret<Vector3>().CopyFrom(allPosition);
         var allMob = MobsAlive.Select(x => x.Data).ToArray();
         NativeArray<MobData> allMobsData = new NativeArray<MobData>(allMob.Length, Allocator.TempJob);
         allMobsData.CopyFrom(allMob);
@@ -89,6 +86,7 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < MobsAlive.Count; i++)
         {
             var mob = MobsAlive[i];
+            if (mob.Data.IsDead) continue;
             mob.transform.LookAt(BattleManager.Instance.Player.position);
             if (shouldMove[i])
             {

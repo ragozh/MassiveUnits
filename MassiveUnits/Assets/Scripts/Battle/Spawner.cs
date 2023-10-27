@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
@@ -32,9 +33,10 @@ public class Spawner : MonoBehaviour
     [SerializeField]
     GameObject _mobPrefab;
     [SerializeField]
-    int _mapSize, _countPerSpawn;
+    int _mapSize;
+    float _countPerSpawn = 1;
     [SerializeField]
-    float _spawnRate;
+    float _spawnRate = 0.5f;
     int _mobCount = 0;
     public int MobCount => _mobCount;
     // Start is called before the first frame update
@@ -45,15 +47,24 @@ public class Spawner : MonoBehaviour
     {
         StartCoroutine(Spawning(spawnCount));
     }
+    [SerializeField]
+    TextMeshProUGUI _spawnRateText;
+    public void SetSpawnRate() => _countPerSpawn = int.Parse(_spawnRateText.text);
+    public void ToggleSpawn()
+    {
+        shouldSpawn = !shouldSpawn;
+        StartSpawn(1);
+    }
+
+    bool shouldSpawn = false;
     IEnumerator Spawning(int spawnCount)
     {
-        while (_mobCount < spawnCount)
+        while (shouldSpawn)
         {
             //SpawnAMob();
             for (int i = 0; i < _countPerSpawn; i++)
             {
                 var newMob = SpawnAMob(); // MeleeMob RangeMob
-                BattleManager.Instance.MobsAlive.Add(newMob);
             }
             yield return new WaitForSeconds(_spawnRate);
         }
@@ -62,9 +73,9 @@ public class Spawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            StartSpawn(1);
+            SpawnAMob();
         }
         if (Input.GetKey(KeyCode.Alpha2))
         {
@@ -94,6 +105,7 @@ public class Spawner : MonoBehaviour
         modelPref.Spawn(rdPos, newMob.ModelHolder);
         modelPref.transform.localPosition = Vector3.zero;
         _mobCount++;
+        BattleManager.Instance.MobsAlive.Add(newMob);
         return newMob;
 
         Vector3 GetRandomPosition()

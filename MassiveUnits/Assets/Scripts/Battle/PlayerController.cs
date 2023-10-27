@@ -1,5 +1,8 @@
+using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -16,19 +19,22 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _animator = GetComponentInChildren<Animator>();
+        SetupPointer();
     }
     // Update is called once per frame
     UnitState _state = UnitState.ILDE;
     void Update()
     {
-        
     }
+    bool _isAttacking = false;
     private void FixedUpdate()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (!_isAttacking)
+            _attackTick+= Time.deltaTime;
+        if (_attackTick >= _attackDelay)
         {
+            _attackTick -= _attackDelay;
             Attack();
-            return;
         }
         var direction = InputHandler();
         if (direction.sqrMagnitude > 0)
@@ -52,14 +58,91 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    float _attackTick = 0;
     [SerializeField]
-    Transform _weapon;
+    Transform _weapon, _weaponModel, _attackPoint, _start, _end, _mid;
+    Transform _startPointer, _endPointer;
     [SerializeField]
-    float _range, _arc;
+    float _range, _arc, _closeRange, _closeArc, _attackDelay;
     public void Attack()
     {
-        var stabDestinatiob = _playerModel.forward * _range;
-        _weapon.LookAt(stabDestinatiob);
+        _isAttacking = true;
+        var middle = _playerModel.forward;
+        var origionPos = _weapon.localPosition;
+        var origin = _weapon.rotation;   
+        Sequence chained = DOTween.Sequence();
+        chained.Append(_weapon.DOMove(_attackPoint.position, 0.1f));
+        _weaponModel.DOLocalMove(Vector3.forward * _range, 0.1f);
+        chained.Append(_weapon.DOLookAt(_startPointer.position, 0.1f));
+        chained.Append(_weapon.DOLookAt(_endPointer.position, 0.3f).OnComplete(() =>
+        {
+            HitMobInArc(middle);
+        }));
+        chained.Append(_weaponModel.DOLocalMove(Vector3.zero, 0.1f));
+        chained.Append(_weapon.DOLocalMove(origionPos, 0.1f).OnComplete(() =>
+        {
+            _isAttacking = false;
+            _weapon.localPosition = origionPos;
+            _weapon.rotation = origin;
+        }));
+    }
+    void SetupPointer()
+    {
+        _startPointer = _start.GetChild(0);
+        _endPointer = _end.GetChild(0);
+        var localPos = _playerModel.forward * _range;
+        localPos = new Vector3(localPos.x, _attackPoint.position.y, localPos.z);
+        _mid.localPosition = localPos;
+        _endPointer.localPosition = localPos;
+        _startPointer.localPosition = localPos;
+        _start.eulerAngles = new Vector3(0, -_arc / 2, 0);
+        _end.eulerAngles = new Vector3(0, _arc / 2, 0);
+    }
+    void ResetPointer()
+    {
+
+    }
+    public Vector3 RotateY(Vector3 v, float angle)
+    {
+        float sin = Mathf.Sin(angle);
+        float cos = Mathf.Cos(angle);
+        var r = v;
+        float tx = v.x;
+        float tz = v.z;
+        r.x = (cos * tx) + (sin * tz);
+        r.z = (cos * tz) - (sin * tx);
+        return r;
+    }
+    public void HitMobInArc(Vector3 middle)
+    {
+        var allMobInRange = BattleManager.Instance.MobsAlive.Where(x => !x.Data.IsDead && (transform.position - x.transform.position).sqrMagnitude <= _range * _range).ToList();
+        List<MobController> hits = new List<MobController>();
+        for (int i = 0; i < allMobInRange.Count; i++)
+        {
+            var mob = allMobInRange[i];
+            if (mob == null) continue;
+            Vector3 meToTarget = mob.transform.position - _playerModel.position;
+            meToTarget = new Vector3(meToTarget.x, 0, meToTarget.z);
+            double angle = Vector3.Angle(middle, meToTarget);
+            if (Math.Abs(angle) <= _arc / 2)
+            {
+                hits.Add(mob);
+            }
+            // incase mob too close
+            if (angle <= _closeArc / 2 && (transform.position - mob.transform.position).sqrMagnitude <= _closeRange * _closeRange)
+            {
+                hits.Add(mob);
+            }
+        }
+        for (int i = 0; i < hits.Count; i++)
+        {
+            hits[i].Die();
+        }
+    }
+    public static double DegreeToRadian(double degrees)
+    {
+        double radians = (Math.PI / 180) * degrees;
+        return (radians);
     }
     public void PlayAnim(string animName, float animDuration = 0)
     {
@@ -89,24 +172,9 @@ public class PlayerController : MonoBehaviour
     }
     Vector3 InputHandler()
     {
-        var direction = Vector3.zero;
-        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
-        {
-            direction += Vector3.forward;
-        }
-        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
-        {
-            direction += Vector3.right;
-        }
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
-        {
-            direction += Vector3.left;
-        }
-        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
-        {
-            direction += Vector3.back;
-        }
-        return direction.normalized;
+        var v = Input.GetAxis("Vertical");
+        var h = Input.GetAxis("Horizontal");
+        return new Vector3(h, 0, v);
     }
 }
 public enum UnitState : byte
