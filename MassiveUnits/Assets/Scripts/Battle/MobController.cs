@@ -11,6 +11,7 @@ public class MobController : MonoBehaviour, IPoolObject
     public MobData Data;
     Animator _animator;
     public Quadtree Quad;
+    public HPBarController HPBar;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,12 +22,26 @@ public class MobController : MonoBehaviour, IPoolObject
     void Update()
     {
     }
+    bool showHPBar = false;
+    public void SetHPBar(HPBarController hpBar)
+    {
+        HPBar = hpBar;
+        HPBar.Setup();
+        HPBar.gameObject.SetActive(showHPBar);
+    }
     public void Attack()
     {
         if (State != UnitState.ATTACK)
         {
             State = UnitState.ATTACK;
-            PlayAnim("Attack01", callback: () => { State = UnitState.ILDE; });
+            PlayAnim("Attack01", callback: () =>
+            {
+                if (Data.Range <= 2)
+                {
+                    BattleManager.Instance.Player.TakeDamage((int)Data.Damage);
+                }
+                State = UnitState.ILDE;
+            });
         }
     }
     public void Step(Vector3 nextStep)
@@ -37,6 +52,10 @@ public class MobController : MonoBehaviour, IPoolObject
             PlayAnim("WalkFWD");
         }
         transform.position = nextStep;
+        if (showHPBar)
+        {
+            HPBar.UpdatePosition(nextStep);
+        }
         Data.LastestPosition = new System.Numerics.Vector3(nextStep.x, nextStep.y, nextStep.z);
         if (!Quad.IsInside(Data.LastestPosition))
         {
@@ -63,10 +82,25 @@ public class MobController : MonoBehaviour, IPoolObject
             callback();
         }
     }
+    public void TakeDamage(int damage)
+    {
+        Data.HP -= damage;
+        if (Data.HP < Data.MaxHP)
+        {
+            showHPBar = true;
+            HPBar.gameObject.SetActive(showHPBar);
+            HPBar.UpdatePosition(transform.position);
+        }
+        HPBar.UpdateValue(Data.HP, Data.MaxHP);
+        if (Data.HP <= 0)
+        {
+            Die();
+        }
+    }
     public void Die()
     {
         Data.IsDead = true;
-        PlayAnim("Die",callback: () =>
+        PlayAnim("Die", callback: () =>
         {
             gameObject.Despawn();
         });
@@ -85,6 +119,7 @@ public class MobController : MonoBehaviour, IPoolObject
     public void OnSpawn()
     {
         Data.IsDead = false;
+        showHPBar = false;
     }
 
     public void OnDespawn()

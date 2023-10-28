@@ -46,6 +46,8 @@ public class Spawner : MonoBehaviour
     }
     [SerializeField]
     TextMeshProUGUI _spawnRateText;
+    [SerializeField]
+    Transform _groupHPBar;
     public void SetSpawnRate() => _countPerSpawn = int.Parse(_spawnRateText.text);
     public void ToggleSpawn()
     {
@@ -93,11 +95,13 @@ public class Spawner : MonoBehaviour
     public MobController SpawnAMob()
     {
         string model = Random.Range(0, 11) < 4 ? "RangeMob" : "MeleeMob";
-        float range = model == "RangeMob" ? 4 : 2;
+        float range = model == "RangeMob" ? 4 : 1.5f;
         float moveSpeed = model == "RangeMob" ? 2.5f : 3;
+        int hp = model == "RangeMob" ? 10 : 20;
+        float damage = model == "RangeMob" ? 3 : 1;
         var rdPos = GetRandomPosition();
         System.Numerics.Vector3 newPos = new System.Numerics.Vector3(rdPos.x, rdPos.y, rdPos.z);
-        MobData mobData = new MobData(_mobCount, range, moveSpeed, newPos);
+        MobData mobData = new MobData(_mobCount, hp, damage, range, moveSpeed, newPos);
         var newMobObj = _mobPrefab.gameObject.Spawn(rdPos, transform);
         var newMob = newMobObj.GetComponent<MobController>();
         newMob.Data = mobData;
@@ -106,6 +110,10 @@ public class Spawner : MonoBehaviour
         modelPref.transform.localPosition = Vector3.zero;
         _mobCount++;
         BattleManager.Instance.AddMob(newMob);
+
+        var hpBarPref = Resources.Load<GameObject>("Prefabs/HeathBar");
+        var newHPBar = hpBarPref.Spawn(rdPos, _groupHPBar);
+        newMob.SetHPBar(newHPBar.GetComponent<HPBarController>());
         return newMob;
 
         Vector3 GetRandomPosition()

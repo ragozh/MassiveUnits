@@ -12,14 +12,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Transform _objDirection;
     [SerializeField]
-    float _moveSpeed;
+    float _moveSpeed, _dmg;
     [SerializeField]
     Animator _animator;
+    [SerializeField]
+    HPBarController _hpBar;
     // Start is called before the first frame update
     void Start()
     {
         _animator = GetComponentInChildren<Animator>();
         SetupPointer();
+        _hpBar.UpdatePosition(transform.position);
+        maxHP = HP;
     }
     // Update is called once per frame
     UnitState _state = UnitState.ILDE;
@@ -47,6 +51,7 @@ public class PlayerController : MonoBehaviour
             _objDirection.localPosition = direction;
             _playerModel.LookAt(_objDirection);
             transform.position += direction * Time.deltaTime * _moveSpeed;
+            //_hpBar.UpdatePosition(transform.position);
         }
         else
         {
@@ -64,6 +69,9 @@ public class PlayerController : MonoBehaviour
     Transform _startPointer, _endPointer;
     [SerializeField]
     float _range, _arc, _closeRange, _closeArc, _attackDelay;
+    [SerializeField]
+    int HP = 100;
+    int maxHP;
     public void Attack()
     {
         _isAttacking = true;
@@ -130,20 +138,25 @@ public class PlayerController : MonoBehaviour
                 hits.Add(mob);
             }
             // incase mob too close
-            if (angle <= _closeArc / 2 && (transform.position - mob.transform.position).sqrMagnitude <= _closeRange * _closeRange)
+            if (!hits.Contains(mob) & angle <= _closeArc / 2 && (transform.position - mob.transform.position).sqrMagnitude <= _closeRange * _closeRange)
             {
                 hits.Add(mob);
             }
         }
         for (int i = 0; i < hits.Count; i++)
         {
-            hits[i].Die();
+            hits[i].TakeDamage((int)_dmg);
         }
     }
     public static double DegreeToRadian(double degrees)
     {
         double radians = (Math.PI / 180) * degrees;
         return (radians);
+    }
+    public void TakeDamage(int damage)
+    {
+        HP -= damage;
+        _hpBar.UpdateValue(HP, maxHP);
     }
     public void PlayAnim(string animName, float animDuration = 0)
     {

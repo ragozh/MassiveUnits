@@ -8,11 +8,16 @@ public struct AvoidanceJob : IJobParallelFor
     [ReadOnly] public float3 PlayerPosition;
     [ReadOnly] public float DeltaTime;
     [WriteOnly] public NativeArray<float3> MobSteps;
+    [WriteOnly] public NativeArray<float3> MobNewSteps;
     [WriteOnly] public NativeArray<bool> MobCanMove;
     const float SENSING_RADIUS = 3;
     public void Execute(int index)
     {
-
+        var mob = Mobs[index];
+        var step = MobSteps[index];
+        for (int i = 0; i < Mobs.Length; i++)
+        {
+        }
     }
 
     private float3 CalculateNewPosition(int index, MobData mob)

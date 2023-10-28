@@ -33,12 +33,12 @@ public class BattleManager : MonoBehaviour
         }
     }
     [SerializeField]
-    Transform _player;
-    public Transform Player => _player;
+    PlayerController _player;
+    public PlayerController Player => _player;
     [SerializeField]
     float _mapSize, _mobCollideRadius;
     public float MapSize => MapSize;
-    public float SqrDistanceToPlayer(Vector3 position) => (position - Player.position).sqrMagnitude;
+    public float SqrDistanceToPlayer(Vector3 position) => (position - Player.transform.position).sqrMagnitude;
     public List<MobController> MobsAlive = new List<MobController>();
     public Quadtree Quadtree;
     public void AddMob(MobController newMob)
@@ -77,18 +77,29 @@ public class BattleManager : MonoBehaviour
         NativeArray<MobData> allMobsData = new NativeArray<MobData>(allMob.Length, Allocator.TempJob);
         allMobsData.CopyFrom(allMob);
 
-        NativeArray<float3> NewMobsPosition = new NativeArray<float3>(allMob.Length, Allocator.TempJob);
+        NativeArray<float3> MobSteps = new NativeArray<float3>(allMob.Length, Allocator.TempJob);
         NativeArray<bool> shouldMove = new NativeArray<bool>(allMob.Length, Allocator.TempJob);
         MobJob newMobJob = new MobJob()
         {
             Mobs = allMobsData,
-            PlayerPosition = BattleManager.Instance.Player.position,
+            PlayerPosition = BattleManager.Instance.Player.transform.position,
             DeltaTime = Time.deltaTime,
-            MobSteps = NewMobsPosition,
+            MobSteps = MobSteps,
             MobCanMove = shouldMove
         };
         JobHandle mobJobHandle = newMobJob.Schedule(allMob.Length, 20);
         mobJobHandle.Complete();
+
+        NativeArray<float3> MobNewSteps = new NativeArray<float3>(allMob.Length, Allocator.TempJob);
+        AvoidanceJob newAvoidance = new AvoidanceJob()
+        {
+            Mobs = allMobsData,
+            PlayerPosition = BattleManager.Instance.Player.transform.position,
+            DeltaTime = Time.deltaTime,
+            MobSteps = newMobJob.MobSteps,
+            MobNewSteps = MobNewSteps,
+            MobCanMove = shouldMove
+        };
 
         Vector3[] newPosition = new Vector3[allMob.Length];
         newMobJob.MobSteps.Reinterpret<Vector3>().CopyTo(newPosition);
@@ -102,7 +113,7 @@ public class BattleManager : MonoBehaviour
         {
             var mob = MobsAlive[i];
             if (mob.Data.IsDead) continue;
-            mob.transform.LookAt(BattleManager.Instance.Player.position);
+            mob.transform.LookAt(BattleManager.Instance.Player.transform.position);
             if (shouldMove[i])
             {
                 mob.Step(positions[i]);

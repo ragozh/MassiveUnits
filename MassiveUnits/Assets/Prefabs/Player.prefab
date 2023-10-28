@@ -309,7 +309,7 @@ Camera:
   m_GameObject: {fileID: 5212059791423417603}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -331,11 +331,11 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: -1
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -848,6 +848,7 @@ MonoBehaviour:
   _objDirection: {fileID: 4954280352877156501}
   _moveSpeed: 5.5
   _animator: {fileID: 0}
+  _hpBar: {fileID: 0}
   _weapon: {fileID: 6061533512832994838}
   _weaponModel: {fileID: 5929577632590662353}
   _attackPoint: {fileID: 4507384879781574969}
@@ -856,6 +857,9 @@ MonoBehaviour:
   _mid: {fileID: 454277032555061487}
   _range: 5
   _arc: 100
+  _closeRange: 2
+  _closeArc: 140
+  _attackDelay: 1.5
 --- !u!1001 &6988148022686396241
 PrefabInstance:
   m_ObjectHideFlags: 0
