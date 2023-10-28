@@ -20,7 +20,7 @@ public class HPBarController : MonoBehaviour
     {
         var screenPoint = Camera.main.WorldToViewportPoint(position);
         var rectPos = new Vector2(screenPoint.x * _rect.sizeDelta.x, screenPoint.y * _rect.sizeDelta.y);
-        transform.localPosition = rectPos - _rect.sizeDelta * 0.5f + Vector2.up * 100;
+        transform.localPosition = rectPos - _rect.sizeDelta * 0.5f + Vector2.up * 45;
     }
     public void UpdateValue(int hp, int maxHP)
     {

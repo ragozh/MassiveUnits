@@ -95,7 +95,7 @@ public class Spawner : MonoBehaviour
     public MobController SpawnAMob()
     {
         string model = Random.Range(0, 11) < 4 ? "RangeMob" : "MeleeMob";
-        float range = model == "RangeMob" ? 4 : 1.5f;
+        float range = model == "RangeMob" ? 5 : 1.5f;
         float moveSpeed = model == "RangeMob" ? 2.5f : 3;
         int hp = model == "RangeMob" ? 10 : 20;
         float damage = model == "RangeMob" ? 3 : 1;

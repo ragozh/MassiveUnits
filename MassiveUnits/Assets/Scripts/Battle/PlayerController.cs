@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour
     public void HitMobInArc(Vector3 middle)
     {
         //var allMobInRange = BattleManager.Instance.MobsAlive.Where(x => !x.Data.IsDead && (transform.position - x.transform.position).sqrMagnitude <= _range * _range).ToList();
-        var allMobInRange = BattleManager.Instance.Quadtree.GetListMobInRange(transform.position, _range);
+        List<MobController> allMobInRange = BattleManager.Instance.Quadtree.GetListMobInRange(transform.position, _range);
         List<MobController> hits = new List<MobController>();
         for (int i = 0; i < allMobInRange.Count; i++)
         {

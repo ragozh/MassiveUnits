@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class MobController : MonoBehaviour, IPoolObject
     Animator _animator;
     public Quadtree Quad;
     public HPBarController HPBar;
+    public Transform AttackPoint;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +25,8 @@ public class MobController : MonoBehaviour, IPoolObject
     {
     }
     bool showHPBar = false;
+
+    GameObject projectilePref;
     public void SetHPBar(HPBarController hpBar)
     {
         HPBar = hpBar;
@@ -40,9 +44,22 @@ public class MobController : MonoBehaviour, IPoolObject
                 {
                     BattleManager.Instance.Player.TakeDamage((int)Data.Damage);
                 }
+                else
+                {
+                    SpawnProjectile();
+                }
                 State = UnitState.ILDE;
             });
         }
+    }
+    void SpawnProjectile()
+    {
+        var newProjectile = projectilePref.Spawn(AttackPoint.position, BattleManager.Instance.Player.transform);
+        newProjectile.transform.DOJump(BattleManager.Instance.Player.transform.position, 2, 1, 1).OnComplete(() =>
+        {
+            BattleManager.Instance.Player.TakeDamage((int)Data.Damage);
+            newProjectile.Despawn();
+        });
     }
     public void Step(Vector3 nextStep)
     {
@@ -128,10 +145,11 @@ public class MobController : MonoBehaviour, IPoolObject
         {
             child.gameObject.Despawn();
         }
+        Quad.RemoveMob(this);
     }
 
     public void OnCreated()
     {
-
+        projectilePref = Resources.Load<GameObject>("Prefabs/Projectile");
     }
 }
