@@ -31,7 +31,7 @@ public class Spawner : MonoBehaviour
     }
     [SerializeField]
     GameObject _mobPrefab;
-    float _countPerSpawn = 1;
+    float _countPerSpawn = 20;
     [SerializeField]
     float _spawnRate = 0.5f;
     int _mobCount = 0;
