@@ -94,6 +94,7 @@ public class Spawner : MonoBehaviour
     }
     public MobController SpawnAMob()
     {
+        _mobCount++;
         string model = Random.Range(0, 11) < 4 ? "RangeMob" : "MeleeMob";
         float range = model == "RangeMob" ? 5 : 1.5f;
         float moveSpeed = model == "RangeMob" ? 2.5f : 3;
@@ -108,7 +109,6 @@ public class Spawner : MonoBehaviour
         var modelPref = Resources.Load<GameObject>("Prefabs/" + model);
         modelPref.Spawn(rdPos, newMob.ModelHolder);
         modelPref.transform.localPosition = Vector3.zero;
-        _mobCount++;
         BattleManager.Instance.AddMob(newMob);
 
         var hpBarPref = Resources.Load<GameObject>("Prefabs/HeathBar");

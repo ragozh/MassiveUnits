@@ -128,7 +128,7 @@ public class PlayerController : MonoBehaviour
         List<MobController> hits = new List<MobController>();
         for (int i = 0; i < allMobInRange.Count; i++)
         {
-            var mob = BattleManager.Instance.MobsAlive[allMobInRange[i].Data.MobId];
+            var mob = BattleManager.Instance.MobsAlive[allMobInRange[i].Data.MobId - 1];
             if (mob == null || mob.Data.IsDead) continue;
             Vector3 meToTarget = mob.transform.position - _playerModel.position;
             meToTarget = new Vector3(meToTarget.x, 0, meToTarget.z);

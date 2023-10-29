@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Collections;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -6,7 +9,7 @@ public class Quadtree
 {
     const int _maxLevel = 3;
     int _level;
-    float _minX, _minZ, _maxX, _maxZ;
+    public float MinX, MinZ, MaxX, MaxZ;
     Quadtree[] nodes;
     List<MobController> mobs = new List<MobController>();
     public List<MobController> Mobs => mobs;
@@ -15,20 +18,20 @@ public class Quadtree
     public Quadtree(int level, int index, float minX, float maxX, float minZ, float maxZ, Quadtree parent = null)
     {
         _level = level;
-        _minX = minX;
-        _maxX = maxX;
-        _minZ = minZ;
-        _maxZ = maxZ;
+        MinX = minX;
+        MaxX = maxX;
+        MinZ = minZ;
+        MaxZ = maxZ;
         Parent = parent;
-        string parentIndex = parent != null ? parent.QuadIndex + "-" : ""; 
+        string parentIndex = parent != null ? parent.QuadIndex + "-" : "";
         QuadIndex = $"{parentIndex}{index}";
     }
     public bool IsInside(System.Numerics.Vector3 possition, float range = 0)
     {
-        return !(possition.X + range <= _minX
-            || possition.X - range > _maxX
-            || possition.Z + range <= _minZ
-            || possition.Z - range > _maxZ);
+        return !(possition.X + range <= MinX
+            || possition.X - range > MaxX
+            || possition.Z + range <= MinZ
+            || possition.Z - range > MaxZ);
     }
     public void CreateNewQuadTree()
     {
@@ -47,12 +50,12 @@ public class Quadtree
     void Split()
     {
         nodes = new Quadtree[4];
-        var middleX = (_maxX + _minX) / 2;
-        var middleZ = (_maxZ + _minZ) / 2;
-        nodes[0] = new Quadtree(_level + 1, 0, _minX, middleX, middleZ, _maxZ, this);
-        nodes[1] = new Quadtree(_level + 1, 1, middleX, _maxX, middleZ, _maxZ, this);
-        nodes[2] = new Quadtree(_level + 1, 2, _minX, middleX, _minZ, middleZ, this);
-        nodes[3] = new Quadtree(_level + 1, 3, middleX, _maxX, _minZ, middleZ, this);
+        var middleX = (MaxX + MinX) / 2;
+        var middleZ = (MaxZ + MinZ) / 2;
+        nodes[0] = new Quadtree(_level + 1, 0, MinX, middleX, middleZ, MaxZ, this);
+        nodes[1] = new Quadtree(_level + 1, 1, middleX, MaxX, middleZ, MaxZ, this);
+        nodes[2] = new Quadtree(_level + 1, 2, MinX, middleX, MinZ, middleZ, this);
+        nodes[3] = new Quadtree(_level + 1, 3, middleX, MaxX, MinZ, middleZ, this);
     }
     public void Insert(MobController mob)
     {
@@ -104,7 +107,7 @@ public class Quadtree
     {
         List<MobData> result = new List<MobData>();
         var quads = GetQuadInRange(mob.LastestPosition, range);
-        foreach ( var quad in quads )
+        foreach (var quad in quads)
         {
             result.AddRange(quad.Mobs);
         }
@@ -124,5 +127,28 @@ public class Quadtree
             }
         }
         return result;
+    }
+}
+public struct QuadData
+{
+    public int Id;
+    public float MinX;
+    public float MinZ;
+    public float MaxX;
+    public float MaxZ;
+    public QuadData(int id, float minX, float maxX, float minZ, float maxZ)
+    {
+        Id = id;
+        MinX = minX;
+        MinZ = minZ;
+        MaxX = maxX;
+        MaxZ = maxZ;
+    }
+    public bool IsInside(float3 possition, float range = 0)
+    {
+        return !(possition.x + range <= MinX
+            || possition.x - range > MaxX
+            || possition.z + range <= MinZ
+            || possition.z - range > MaxZ);
     }
 }

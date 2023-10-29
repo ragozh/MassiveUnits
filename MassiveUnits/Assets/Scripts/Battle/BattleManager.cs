@@ -87,19 +87,21 @@ public class BattleManager : MonoBehaviour
             MobSteps = MobSteps,
             MobCanMove = shouldMove
         };
-        JobHandle mobJobHandle = newMobJob.Schedule(allMob.Length, 20);
+        JobHandle mobJobHandle = newMobJob.Schedule(allMob.Length, 40);
         mobJobHandle.Complete();
 
-        NativeArray<float3> MobNewSteps = new NativeArray<float3>(allMob.Length, Allocator.TempJob);
-        AvoidanceJob newAvoidance = new AvoidanceJob()
-        {
-            Mobs = allMobsData,
-            PlayerPosition = BattleManager.Instance.Player.transform.position,
-            DeltaTime = Time.deltaTime,
-            MobSteps = newMobJob.MobSteps,
-            MobNewSteps = MobNewSteps,
-            MobCanMove = shouldMove
-        };
+        //NativeArray<float3> MobNewSteps = new NativeArray<float3>(allMob.Length, Allocator.TempJob);
+        //AvoidanceJob newAvoidance = new AvoidanceJob()
+        //{
+        //    Mobs = allMobsData,
+        //    PlayerPosition = BattleManager.Instance.Player.transform.position,
+        //    DeltaTime = Time.deltaTime,
+        //    MobSteps = newMobJob.MobSteps,
+        //    MobNewSteps = MobNewSteps,
+        //    MobCanMove = shouldMove
+        //};
+        //JobHandle avoidanceJobHandle = newAvoidance.Schedule(allMob.Length, 40);
+        //avoidanceJobHandle.Complete();
 
         Vector3[] newPosition = new Vector3[allMob.Length];
         newMobJob.MobSteps.Reinterpret<Vector3>().CopyTo(newPosition);

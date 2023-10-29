@@ -7,7 +7,7 @@ public struct AvoidanceJob : IJobParallelFor
     [ReadOnly] public NativeArray<MobData> Mobs;
     [ReadOnly] public float3 PlayerPosition;
     [ReadOnly] public float DeltaTime;
-    [WriteOnly] public NativeArray<float3> MobSteps;
+    [ReadOnly] public NativeArray<float3> MobSteps;
     [WriteOnly] public NativeArray<float3> MobNewSteps;
     [WriteOnly] public NativeArray<bool> MobCanMove;
     const float SENSING_RADIUS = 3;
@@ -15,25 +15,27 @@ public struct AvoidanceJob : IJobParallelFor
     {
         var mob = Mobs[index];
         var step = MobSteps[index];
+        int[] collides = new int[Mobs.Length - 1];
+        int cIdx = 0;
         for (int i = 0; i < Mobs.Length; i++)
         {
+            if (i == index) continue;
+            if (math.distancesq(MobSteps[i], MobSteps[index]) <= SENSING_RADIUS * SENSING_RADIUS)
+            {
+                collides[cIdx] = i;
+            }
         }
+        Calculate(index, collides);
     }
 
-    private float3 CalculateNewPosition(int index, MobData mob)
+    private float3 Calculate(int index, int[] collides)
     {
-        float3 mobPos = new float3(mob.LastestPosition.X, 0, mob.LastestPosition.Z);
         float3 newPosition;
-        if (math.distancesq(PlayerPosition, mobPos) > mob.Range * mob.Range)
+        for (int i = 0; i < collides.Length; i++)
         {
-            var direction = DirectionToPLayer(mobPos);
-            newPosition = mobPos + direction * mob.MoveSpeed * DeltaTime;
-            MobCanMove[index] = true;
+
         }
-        else
-        {
-            newPosition = mobPos;
-        }
+        newPosition = MobSteps[index];
         return newPosition;
     }
 
